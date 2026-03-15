@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LINE-O-RAMA</title>
+<link href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+<script src="https://www.desmos.com/api/v1.8/calculator.js?apiKey=dcb31709b452b1cf9dc26972add0fda6"></script>
+<style>
+  :root {
+    --bg:        #0d0d1a;
+    --surface:   #13132a;
+    --panel:     #1a1a38;
+    --border:    rgba(120,100,255,0.25);
+    --neon:      #7c6fff;
+    --neon-glow: rgba(124,111,255,0.45);
+    --cyan:      #00e5ff;
+    --cyan-glow: rgba(0,229,255,0.4);
+    --green:     #00e676;
+    --red:       #ff4f6a;
+    --amber:     #ffb700;
+    --text:      #e8e6ff;
+    --muted:     #7a78a0;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Nunito', sans-serif;
+    background-color: var(--bg);
+    background-image:
+      radial-gradient(ellipse 80% 50% at 50% -10%, rgba(124,111,255,0.18) 0%, transparent 60%),
+      repeating-linear-gradient(0deg, transparent, transparent 39px, rgba(124,111,255,0.04) 40px),
+      repeating-linear-gradient(90deg, transparent, transparent 39px, rgba(124,111,255,0.04) 40px);
+    min-height: 100vh;
+    color: var(--text);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 32px 16px 60px;
+  }
+
+  /* ── HEADER ── */
+  .header {
+    text-align: center;
+    margin-bottom: 28px;
+    position: relative;
+  }
+
+  .title-wrap {
+    display: inline-block;
+    position: relative;
+  }
+
+  h1 {
+    font-family: 'Black Han Sans', sans-serif;
+    font-size: clamp(42px, 9vw, 78px);
+    letter-spacing: 0.04em;
+    line-height: 1;
+    color: #fff;
+    text-shadow:
+      0 0 12px var(--neon-glow),
+      0 0 30px var(--neon-glow),
+      0 0 70px rgba(124,111,255,0.25);
+    position: relative;
+  }
+
+  h1 .line-part { color: var(--cyan); text-shadow: 0 0 12px var(--cyan-glow), 0 0 30px var(--cyan-glow); }
+  h1 .o-part    { color: #fff; }
+  h1 .rama-part { color: var(--neon); text-shadow: 0 0 12px var(--neon-glow), 0 0 40px var(--neon-glow); }
+
+  .title-underline {
+    display: block;
+    height: 3px;
+    margin: 8px auto 0;
+    width: 70%;
+    background: linear-gradient(90deg, transparent, var(--cyan), var(--neon), transparent);
+    border-radius: 2px;
+    box-shadow: 0 0 10px var(--neon-glow);
+  }
+
+  .subtitle {
+    font-size: 13px;
+    color: var(--muted);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    margin-top: 10px;
+    font-weight: 600;
+  }
+
+  /* ── CARD ── */
+  .card {
+    width: 100%;
+    max-width: 620px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 24px 26px 28px;
+    box-shadow:
+      0 0 0 1px rgba(124,111,255,0.08),
+      0 8px 40px rgba(0,0,0,0.5),
+      0 0 60px rgba(124,111,255,0.07);
+  }
+
+
+
+  /* ── GRAPH ── */
+  #calc-container {
+    width: 100%;
+    height: 340px;
+    border-radius: 14px;
+    border: 1px solid var(--border);
+    overflow: hidden;
+    margin-bottom: 20px;
+    box-shadow: 0 0 0 1px rgba(124,111,255,0.08), inset 0 0 30px rgba(0,0,0,0.3);
+  }
+
+  /* ── INPUT ROW ── */
+  .equation-area {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 14px 18px;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+
+  .eq-label {
+    font-family: 'Black Han Sans', sans-serif;
+    font-size: 22px;
+    color: var(--cyan);
+    text-shadow: 0 0 8px var(--cyan-glow);
+  }
+
+  .eq-input {
+    width: 72px;
+    background: var(--bg);
+    border: 1.5px solid rgba(124,111,255,0.35);
+    border-radius: 8px;
+    padding: 8px 10px;
+    font-size: 18px;
+    font-weight: 700;
+    text-align: center;
+    color: #fff;
+    font-family: 'Nunito', sans-serif;
+    transition: border-color 0.15s, box-shadow 0.15s;
+    appearance: textfield;
+    -moz-appearance: textfield;
+  }
+
+  .eq-input:focus {
+    outline: none;
+    border-color: var(--cyan);
+    box-shadow: 0 0 0 3px rgba(0,229,255,0.15), 0 0 12px rgba(0,229,255,0.1);
+  }
+
+  .eq-input::placeholder { color: var(--muted); font-size: 14px; }
+
+  /* ── BUTTONS ── */
+  .btn-row {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+
+  button {
+    font-family: 'Nunito', sans-serif;
+    font-weight: 800;
+    font-size: 13px;
+    letter-spacing: 0.06em;
+    padding: 10px 20px;
+    border-radius: 10px;
+    border: 1.5px solid transparent;
+    cursor: pointer;
+    transition: all 0.15s;
+    text-transform: uppercase;
+  }
+
+  #check-btn {
+    background: linear-gradient(135deg, var(--neon), #5e4fff);
+    color: #fff;
+    border-color: var(--neon);
+    box-shadow: 0 0 16px var(--neon-glow);
+  }
+  #check-btn:hover {
+    box-shadow: 0 0 26px var(--neon-glow), 0 0 8px var(--neon-glow);
+    transform: translateY(-1px);
+  }
+
+  #new-btn {
+    background: transparent;
+    color: var(--cyan);
+    border-color: rgba(0,229,255,0.35);
+  }
+  #new-btn:hover {
+    background: rgba(0,229,255,0.08);
+    border-color: var(--cyan);
+    box-shadow: 0 0 12px rgba(0,229,255,0.15);
+  }
+
+  #reveal-btn {
+    background: transparent;
+    color: var(--amber);
+    border-color: rgba(255,183,0,0.3);
+    display: none;
+  }
+  #reveal-btn:hover {
+    background: rgba(255,183,0,0.07);
+    border-color: var(--amber);
+  }
+
+  /* ── FEEDBACK ── */
+  #feedback {
+    margin-top: 16px;
+    font-size: 15px;
+    font-weight: 700;
+    min-height: 22px;
+    letter-spacing: 0.02em;
+  }
+
+  .correct { color: var(--green); text-shadow: 0 0 10px rgba(0,230,118,0.4); }
+  .wrong   { color: var(--red);   text-shadow: 0 0 10px rgba(255,79,106,0.4); }
+  .hint    { color: var(--amber); }
+
+  #attempts {
+    font-size: 12px;
+    color: var(--muted);
+    margin-top: 6px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+  }
+
+  /* ── FOOTER ── */
+  .footer {
+    margin-top: 22px;
+    font-size: 11px;
+    color: rgba(120,115,160,0.5);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    text-align: center;
+  }
+  .footer a { color: rgba(124,111,255,0.5); text-decoration: none; }
+  .footer a:hover { color: var(--neon); }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="title-wrap">
+    <h1>
+      <span class="line-part">LINE</span><span class="o-part">-O-</span><span class="rama-part">RAMA</span>
+    </h1>
+    <span class="title-underline"></span>
+  </div>
+  <p class="subtitle">Find the equation of the line</p>
+</div>
+
+<div class="card">
+
+  <div id="calc-container"></div>
+
+  <div class="equation-area">
+    <span class="eq-label">y =</span>
+    <input class="eq-input" id="m-input" placeholder="m" type="text" inputmode="text" />
+    <span class="eq-label">x +</span>
+    <input class="eq-input" id="b-input" placeholder="b" type="text" inputmode="numeric" />
+  </div>
+
+  <div class="btn-row">
+    <button id="check-btn">Check Answer</button>
+    <button id="new-btn">New Line ↻</button>
+    <button id="reveal-btn">Show Answer</button>
+  </div>
+
+  <div id="feedback"></div>
+  <div id="attempts"></div>
+</div>
+
+<div class="footer">
+  <a href="https://everyonelovesmath.com" target="_blank">everyonelovesmath.com</a>
+  &nbsp;·&nbsp; Study the graph · Find m and b · Check it!
+</div>
+
+<script>
+  let trueSlope, trueB, attemptCount;
+
+  // ── Slope pool: integers -7..7 (excl. 0) + all reduced fractions p/q, 2≤q≤5, |p|≤7
+  function gcd(a, b) { a = Math.abs(a); b = Math.abs(b); while (b) { [a, b] = [b, a % b]; } return a; }
+
+  const SLOPES = [];
+  // integers
+  for (let n = -7; n <= 7; n++) {
+    if (n !== 0) SLOPES.push({ val: n, num: n, den: 1 });
+  }
+  // fractions: |numerator| up to 7, denominator 2–5, fully reduced
+  for (let den = 2; den <= 5; den++) {
+    for (let num = -7; num <= 7; num++) {
+      if (num === 0) continue;
+      if (Math.abs(num) === den) continue; // would be integer ±1
+      if (gcd(Math.abs(num), den) === 1) {
+        SLOPES.push({ val: num / den, num, den });
+      }
+    }
+  }
+
+  function formatSlopeFrac(s) {
+    if (s.den === 1) return `${s.num}`;
+    const sign = s.num < 0 ? '-' : '';
+    return `${sign}${Math.abs(s.num)}/${s.den}`;
+  }
+
+  // Build a display string like "y = 2/3 x + 1"
+  function formatEquation(s, b) {
+    const mStr = formatSlopeFrac(s);
+    const bAbs = Math.abs(b);
+    const bSign = b < 0 ? ' − ' : ' + ';
+    if (b === 0) return `y = ${mStr}x`;
+    return `y = ${mStr}x${bSign}${bAbs}`;
+  }
+
+  function pick(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
+  function randInt(min, max) { return Math.floor(Math.random() * (max - min + 1)) + min; }
+
+  const elt = document.getElementById('calc-container');
+  const calculator = Desmos.GraphingCalculator(elt, {
+    expressionsCollapsed: true,
+    settingsMenu: false,
+    zoomButtons: true,
+    expressions: false,
+    keypad: false,
+    lockViewport: false
+  });
+
+  // Generate 10 lattice points centered around x=0 (5 each side, inclusive of 0)
+  function getLatticePoints(s, b) {
+    const { num, den } = s;
+    const step = den;
+    const points = [];
+    // Walk outward from x=0: 0, ±step, ±2*step, ...
+    // Collect 5 non-negative x values and 5 negative x values
+    const pos = [], neg = [];
+    for (let k = 0; pos.length < 5; k++) {
+      const x = k * step;
+      const y = (num * x) / den + b;
+      pos.push([x, y]);
+    }
+    for (let k = 1; neg.length < 5; k++) {
+      const x = -k * step;
+      const y = (num * x) / den + b;
+      neg.push([x, y]);
+    }
+    return [...neg.reverse(), ...pos];
+  }
+
+  const BOUNDS = { left: -10, right: 10, bottom: -8, top: 8 };
+
+  function plotLine() {
+    // Remove old expressions
+    calculator.removeExpression({ id: 'line' });
+    // Remove old lattice points (up to 30)
+    for (let i = 0; i < 50; i++) calculator.removeExpression({ id: `lp${i}` });
+
+    const { num, den } = trueSlope;
+    // Desmos latex for slope: use fraction if den > 1
+    const mLatex = den === 1 ? `${num}` : `\\frac{${num}}{${den}}`;
+    const bLatex = trueB >= 0 ? `+${trueB}` : `${trueB}`;
+
+    calculator.setExpression({
+      id: 'line',
+      latex: `y=${mLatex}x${trueB !== 0 ? bLatex : ''}`,
+      color: '#00e5ff',
+      lineWidth: 2.5
+    });
+
+    // Plot lattice points
+    const pts = getLatticePoints(trueSlope, trueB);
+
+    pts.forEach(([x, y], i) => {
+      calculator.setExpression({
+        id: `lp${i}`,
+        latex: `(${x}, ${y})`,
+        color: '#ffb700',
+        pointSize: 14,
+        pointStyle: Desmos.Styles.POINT,
+        showLabel: false
+      });
+    });
+
+    calculator.setMathBounds(BOUNDS);
+  }
+
+  // Parse "2/3", "-1/4", "2", "-3" → decimal value or NaN
+  function parseFrac(str) {
+    str = str.trim();
+    const slashMatch = str.match(/^(-?\d+)\s*\/\s*(-?\d+)$/);
+    if (slashMatch) {
+      const n = parseInt(slashMatch[1], 10);
+      const d = parseInt(slashMatch[2], 10);
+      if (d === 0) return NaN;
+      return n / d;
+    }
+    return parseFloat(str);
+  }
+
+  function newLine() {
+    trueSlope = pick(SLOPES);
+    trueB = randInt(-4, 4);
+    attemptCount = 0;
+
+    document.getElementById('m-input').value = '';
+    document.getElementById('b-input').value = '';
+    document.getElementById('feedback').textContent = '';
+    document.getElementById('attempts').textContent = '';
+    document.getElementById('reveal-btn').style.display = 'none';
+    document.getElementById('m-input').focus();
+
+    plotLine();
+  }
+
+  function checkAnswer() {
+    const mVal = parseFrac(document.getElementById('m-input').value);
+    const bVal = parseFrac(document.getElementById('b-input').value);
+    const fb   = document.getElementById('feedback');
+    const att  = document.getElementById('attempts');
+
+    if (isNaN(mVal) || isNaN(bVal)) {
+      fb.textContent = 'Fill in both m and b before checking.';
+      fb.className = 'hint';
+      return;
+    }
+
+    attemptCount++;
+
+    const mOk = Math.abs(mVal - trueSlope.val) < 0.0001;
+    const bOk = Math.abs(bVal - trueB) < 0.01;
+
+    if (mOk && bOk) {
+      fb.textContent = '✓ Correct! Great work!';
+      fb.className = 'correct';
+      att.textContent = `Solved in ${attemptCount} attempt${attemptCount !== 1 ? 's' : ''}.`;
+      document.getElementById('reveal-btn').style.display = 'none';
+    } else {
+      let hint = '';
+      if (!mOk && !bOk) hint = 'Both slope and y-intercept need work.';
+      else if (!mOk)    hint = 'Y-intercept is right! Double-check the slope.';
+      else               hint = 'Slope is right! Double-check the y-intercept.';
+      fb.textContent = `✗ Not quite. ${hint}`;
+      fb.className = 'wrong';
+      att.textContent = `Attempts: ${attemptCount}`;
+
+      if (attemptCount >= 3) {
+        document.getElementById('reveal-btn').style.display = 'inline-block';
+      }
+    }
+  }
+
+  document.getElementById('check-btn').addEventListener('click', checkAnswer);
+  document.getElementById('new-btn').addEventListener('click', newLine);
+
+  document.getElementById('m-input').addEventListener('keydown', e => {
+    if (e.key === 'Enter') document.getElementById('b-input').focus();
+  });
+  document.getElementById('b-input').addEventListener('keydown', e => {
+    if (e.key === 'Enter') checkAnswer();
+  });
+
+  document.getElementById('reveal-btn').addEventListener('click', () => {
+    const fb = document.getElementById('feedback');
+    fb.textContent = `Answer: ${formatEquation(trueSlope, trueB)}`;
+    fb.className = 'hint';
+    document.getElementById('reveal-btn').style.display = 'none';
+  });
+
+  newLine();
+</script>
+</body>
+</html>
